@@ -15,4 +15,4 @@ Open `index.html` in a browser, or serve this folder locally. The file is about 
 
 `src/` holds the Blender and viewer build scripts. They expect the model packs, materials and plan to be on the local machine and are not self-contained.
 
-Private repository: `index.html` bundles third-party model packs, so check their licences before sharing.
+`index.html` bundles third-party model packs, which remain under their own licences and are not covered by any licence for this repository.
