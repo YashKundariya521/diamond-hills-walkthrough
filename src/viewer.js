@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 const FT=.3048,S=60.5,OX=1163,OY=217,EYE=5.5*FT,RAD=.24,LSCALE=8,VSCALE=8;
 const PX=p=>(p-OX)/S*FT,PZ=p=>(p-OY)/S*FT;
 const $=id=>document.getElementById(id);
-const b64=id=>{const s=atob($(id).textContent.trim());const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);$(id).remove();return a};
+const b64=async id=>{const el=$(id),gz=el.dataset.gz==='1',s=atob(el.textContent.trim());const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);el.remove();if(!gz)return a;
+  return new Uint8Array(await new Response(new Blob([a]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer())};
 const status=t=>{$('load').textContent=t};
 const tick=()=>new Promise(r=>setTimeout(r,20));
 
@@ -56,26 +58,26 @@ function setupMaterials(root,lightTex){
     const own=(o.name+' '+(o.parent?o.parent.name:'')).toLowerCase();if(/washer|basket/.test(own)){o.material=o.material.clone();o.material.metalness=0;o.material.roughness=.45;o.material.color.setRGB(.8,.8,.78);}
     const uvLM=g.attributes.uv1;
     if(isShell&&uvLM){g.setAttribute('uv1lm',uvLM);const k='L'+o.material.uuid;if(!cache.has(k))cache.set(k,bakedMaterial(o.material,'lm',lightTex));o.material=cache.get(k);stats.lm++;return}
-    const col=g.attributes.color;
-    if(col){g.setAttribute('bakeColor',col);g.deleteAttribute('color');const k='V'+o.material.uuid;if(!cache.has(k)){const c=bakedMaterial(o.material,'v');if(c.alphaTest>0)c.side=THREE.DoubleSide;cache.set(k,c)}o.material=cache.get(k);stats.v++;return}
+    if(g.attributes.color){g.setAttribute('bakeColor',g.attributes.color);g.deleteAttribute('color')}
+    if(g.attributes.bakeColor){const k='V'+o.material.uuid;if(!cache.has(k)){const c=bakedMaterial(o.material,'v');if(c.alphaTest>0)c.side=THREE.DoubleSide;cache.set(k,c)}o.material=cache.get(k);stats.v++;return}
     stats.other++;stats.noColor.push(o.name+'/'+nm)});
   return stats}
 
 async function start(){
   status('Unpacking the flat…');await tick();
-  const rgbe=new RGBELoader(),hdrFrom=id=>{const d=b64(id);const t=rgbe.parse(d.buffer);const x=new THREE.DataTexture(t.data,t.width,t.height,THREE.RGBAFormat,t.type);x.colorSpace=THREE.LinearSRGBColorSpace;x.minFilter=x.magFilter=THREE.LinearFilter;x.mapping=THREE.EquirectangularReflectionMapping;x.flipY=true;x.needsUpdate=true;return x};
-  const lmBlob=new Blob([b64('lightmap')],{type:'image/jpeg'});const lmBmp=await createImageBitmap(lmBlob,{imageOrientation:'none',colorSpaceConversion:'none'});
+  const rgbe=new RGBELoader(),hdrFrom=async id=>{const d=await b64(id);const t=rgbe.parse(d.buffer);const x=new THREE.DataTexture(t.data,t.width,t.height,THREE.RGBAFormat,t.type);x.colorSpace=THREE.LinearSRGBColorSpace;x.minFilter=x.magFilter=THREE.LinearFilter;x.mapping=THREE.EquirectangularReflectionMapping;x.flipY=true;x.needsUpdate=true;return x};
+  const lmBlob=new Blob([await b64('lightmap')],{type:'image/jpeg'});const lmBmp=await createImageBitmap(lmBlob,{imageOrientation:'none',colorSpaceConversion:'none'});
   const lightTex=new THREE.Texture(lmBmp);lightTex.flipY=false;lightTex.colorSpace=THREE.NoColorSpace;lightTex.generateMipmaps=true;lightTex.minFilter=THREE.LinearMipmapLinearFilter;lightTex.magFilter=THREE.LinearFilter;lightTex.anisotropy=8;lightTex.needsUpdate=true;
   status('Loading furniture and materials…');await tick();
-  const glb=b64('glb');const gltf=await new Promise((res,rej)=>new GLTFLoader().parse(glb.buffer,'',res,rej));
+  await MeshoptDecoder.ready;const glb=await b64('glb');const gltf=await new Promise((res,rej)=>new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parse(glb.buffer,'',res,rej));
   scene.add(gltf.scene);window.__stats=setupMaterials(gltf.scene,lightTex);
   const aniso=renderer.capabilities.getMaxAnisotropy();gltf.scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.map)o.material.map.anisotropy=aniso});
   status('Preparing daylight…');await tick();
-  const sky=hdrFrom('sky');sky.minFilter=sky.magFilter=THREE.LinearFilter;
+  const sky=await hdrFrom('sky');sky.minFilter=sky.magFilter=THREE.LinearFilter;
   const skyMesh=new THREE.Mesh(new THREE.SphereGeometry(3000,48,24),new THREE.MeshBasicMaterial({map:sky,side:THREE.BackSide,depthWrite:false,toneMapped:true}));skyMesh.rotation.y=Math.PI*.5;scene.add(skyMesh);
   const ground=new THREE.Mesh(new THREE.CircleGeometry(2800,48),new THREE.MeshBasicMaterial({color:new THREE.Color(.82,.8,.72),fog:false}));ground.rotation.x=-Math.PI/2;ground.position.y=-30;scene.add(ground);
   const pm=new THREE.PMREMGenerator(renderer);const ENV=[];
-  for(let i=0;i<ROOMS.length;i++){const id='env'+i;if(!$(id)){ENV.push(null);continue}const t=hdrFrom(id);ENV.push(pm.fromEquirectangular(t).texture);t.dispose();if(i%4===0){status(`Preparing daylight… ${Math.round(i/ROOMS.length*100)}%`);await tick()}}
+  for(let i=0;i<ROOMS.length;i++){const id='env'+i;if(!$(id)){ENV.push(null);continue}const t=await hdrFrom(id);ENV.push(pm.fromEquirectangular(t).texture);t.dispose();if(i%4===0){status(`Preparing daylight… ${Math.round(i/ROOMS.length*100)}%`);await tick()}}
   scene.environmentRotation=new THREE.Euler(0,window.ENVROT??-Math.PI/2,0);
   buildUI();const applyEnv=R=>{const i=ROOMS.indexOf(R);if(i>=0&&ENV[i])scene.environment=ENV[i];const[a,b,c,d]=R.r;U.uBoxMin.value.set(PX(a),0,PZ(b));U.uBoxMax.value.set(PX(c),9*FT,PZ(d));U.uProbe.value.set((PX(a)+PX(c))/2,1.5,(PZ(b)+PZ(d))/2)};
   window.__applyEnv=applyEnv;applyEnv(ROOMS.find(r=>r.n==='Foyer'));

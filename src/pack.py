@@ -1,9 +1,10 @@
-import base64,json,os,subprocess,sys
+import base64,gzip,json,os,subprocess,sys
 hq=os.path.dirname(os.path.abspath(__file__));out=f'{hq}/out';dst=sys.argv[1]
 env=dict(os.environ)
 subprocess.check_call(['npx','esbuild','viewer.js','--bundle','--minify','--format=iife','--target=es2020','--outfile=viewer.bundle.js','--log-level=warning'],cwd=hq,env=env)
 js=open(f'{hq}/viewer.bundle.js',encoding='utf-8').read().replace('</script>','<\\/script>')
 b=lambda p:base64.b64encode(open(p,'rb').read()).decode()
+z=lambda p:base64.b64encode(gzip.compress(open(p,'rb').read(),6)).decode()
 lay=json.load(open(f'{out}/layout.json'))
 notes=[
  'Every room is furnished. Bath fixtures, kitchen cabinets, rugs, poufs, the jhula and most plants are additions; none are drawn on the plan.',
@@ -24,8 +25,8 @@ html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="
 <div id="toast"></div><div id="notes"><h2>Notes</h2><ul>{''.join('<li>'+n+'</li>' for n in notes)}</ul></div>
 <script type="text/plain" id="layout">{base64.b64encode(json.dumps(lay).encode()).decode()}</script>
 <script type="text/plain" id="lightmap">{b(f'{out}/lightmap.jpg')}</script>
-<script type="text/plain" id="glb">{b(f'{out}/scene.glb')}</script>
-<script type="text/plain" id="sky">{b(f'{out}/sky.hdr')}</script>
-{''.join(f'<script type="text/plain" id="env{i}">{b(f"{out}/env_{i}.hdr")}</script>' for i in range(len(lay['rooms'])) if os.path.exists(f"{out}/env_{i}.hdr"))}
+<script type="text/plain" id="glb" data-gz="1">{z(f'{out}/scene.min.glb')}</script>
+<script type="text/plain" id="sky" data-gz="1">{z(f'{out}/sky.hdr')}</script>
+{''.join(f'<script type="text/plain" id="env{i}" data-gz="1">{z(f"{out}/env_{i}.hdr")}</script>' for i in range(len(lay['rooms'])) if os.path.exists(f"{out}/env_{i}.hdr"))}
 <script>{js}</script></body></html>'''
 open(dst,'w',encoding='utf-8').write(html);print(dst,round(os.path.getsize(dst)/1e6,1),'MB')

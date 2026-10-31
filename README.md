@@ -2,7 +2,7 @@
 
 First-person walkthrough of the Diamond Hills flat in Rajkot, built to scale from the architect's furniture layout (9 ft ceilings, 5.5 ft eye level). Every room is furnished, with light baked in Blender.
 
-Open `index.html` in a browser, or serve this folder locally. The file is about 456 MB, so it takes time and memory to load.
+Open `index.html` in a browser, or serve this folder locally. The file is about 61 MB.
 
 - **Move:** WASD
 - **Look:** click and drag
