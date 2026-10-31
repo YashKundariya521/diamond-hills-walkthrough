@@ -46,8 +46,8 @@ pbr('oak','oak_veneer_01',tile=1.2,nor=.4)
 pbr('fwarm','marble_01',tile=2.4,tint=(.96,.92,.85),rough=.1,nor=.1)
 pbr('fgrey','marble_01',tile=2.4,tint=(.60,.59,.57),rough=.12,nor=.1)
 pbr('fwood','herringbone_parquet',tile=1.8,nor=.6)
-pbr('fstone','smooth_concrete_floor',tile=1.5,nor=.3)
-pbr('fkota','smooth_concrete_floor',tile=1.5,tint=(.7,.72,.68),nor=.4)
+pbr('fstone','marble_01',tile=1.2,tint=(.8,.78,.74),rough=.2,nor=.1)
+pbr('fkota',color=(.34,.34,.31),rough=.62)
 pbr('linen','rough_linen',tile=.5,tint=(.95,.9,.8),nor=.8,sheen=.4)
 pbr('boucle',color=(.78,.71,.58),rough=.95,sheen=.5,norfile='rough_linen',uvs=9)
 pbr('velvetRust',color=(.42,.11,.035),rough=.7,sheen=1.0,norfile='rough_linen',uvs=7)
@@ -60,6 +60,7 @@ pbr('cane',diffpath=f'{HQ}/art/cane.png',alpha=True,rough=.6)
 pbr('brass',color=(.78,.58,.28),metal=1,rough=.28)
 pbr('blackstone',color=(.02,.02,.018),rough=.2)
 pbr('steel',color=(.75,.75,.73),metal=1,rough=.3)
+pbr('bronze',color=(.05,.035,.025),metal=.7,rough=.38)
 pbr('glass',color=(.9,.95,.93),rough=.02,trans=1.0)
 pbr('sheer',color=(.97,.94,.87),rough=.9,trans=.55)
 pbr('rustcurt','rough_linen',tile=.5,tint=(.6,.25,.12),nor=.6)
@@ -132,13 +133,13 @@ def win(r,sill=1.5,head=8.2,inn=None,mat='sheer',cov=.24):
     if vert:
         GLASS.box('glass',X(mx)-.003,Y(r[1]),s,X(mx)+.003,Y(r[3]),h)
         for i in range(n+1):
-            yy=Y(r[1])+(Y(r[3])-Y(r[1]))*i/n;M.box('teak',X(mx)-e,yy-e,s,X(mx)+e,yy+e,h)
-        M.box('teak',X(mx)-e,Y(r[1]),s,X(mx)+e,Y(r[3]),s+.05);M.box('teak',X(mx)-e,Y(r[1]),h-.05,X(mx)+e,Y(r[3]),h)
+            yy=Y(r[1])+(Y(r[3])-Y(r[1]))*i/n;M.box('bronze',X(mx)-e,yy-e,s,X(mx)+e,yy+e,h)
+        M.box('bronze',X(mx)-e,Y(r[1]),s,X(mx)+e,Y(r[3]),s+.05);M.box('bronze',X(mx)-e,Y(r[1]),h-.05,X(mx)+e,Y(r[3]),h)
     else:
         GLASS.box('glass',X(r[0]),Y(my)-.003,s,X(r[2]),Y(my)+.003,h)
         for i in range(n+1):
-            xx=X(r[0])+(X(r[2])-X(r[0]))*i/n;M.box('teak',xx-e,Y(my)-e,s,xx+e,Y(my)+e,h)
-        M.box('teak',X(r[0]),Y(my)-e,s,X(r[2]),Y(my)+e,s+.05);M.box('teak',X(r[0]),Y(my)-e,h-.05,X(r[2]),Y(my)+e,h)
+            xx=X(r[0])+(X(r[2])-X(r[0]))*i/n;M.box('bronze',xx-e,Y(my)-e,s,xx+e,Y(my)+e,h)
+        M.box('bronze',X(r[0]),Y(my)-e,s,X(r[2]),Y(my)+e,s+.05);M.box('bronze',X(r[0]),Y(my)-e,h-.05,X(r[2]),Y(my)+e,h)
     if inn:CURT.append((r,inn,mat,cov))
 def slider(r,inn=None,mat='sheer'):
     thresh(r);pb('wall',r,8.2*FT,H);vert=(r[2]-r[0])<(r[3]-r[1]);e=.03;h=8.2*FT
@@ -147,13 +148,13 @@ def slider(r,inn=None,mat='sheer'):
     if vert:
         a=Y(r[1]);c=Y(r[3]);m=(a+c)/2;GLASS.box('glass',X(mx)-.003,m,0,X(mx)+.003,c,h)
         for i in range(n//2+1):
-            yy=m+(c-m)*i/(n//2);M.box('teak',X(mx)-e,yy-e,0,X(mx)+e,yy+e,h)
-        M.box('teak',X(mx)-e,m,0,X(mx)+e,c,.06);colliders.append((r[0],my,r[2],r[3],'glass'))
+            yy=m+(c-m)*i/(n//2);M.box('bronze',X(mx)-e,yy-e,0,X(mx)+e,yy+e,h)
+        M.box('bronze',X(mx)-e,m,0,X(mx)+e,c,.06);colliders.append((r[0],my,r[2],r[3],'glass'))
     else:
         a=X(r[0]);c=X(r[2]);m=(a+c)/2;GLASS.box('glass',m,Y(my)-.003,0,c,Y(my)+.003,h)
         for i in range(n//2+1):
-            xx=m+(c-m)*i/(n//2);M.box('teak',xx-e,Y(my)-e,0,xx+e,Y(my)+e,h)
-        M.box('teak',m,Y(my)-e,0,c,Y(my)+e,.06);colliders.append((mx,r[1],r[2],r[3],'glass'))
+            xx=m+(c-m)*i/(n//2);M.box('bronze',xx-e,Y(my)-e,0,xx+e,Y(my)+e,h)
+        M.box('bronze',m,Y(my)-e,0,c,Y(my)+e,.06);colliders.append((mx,r[1],r[2],r[3],'glass'))
     if inn:CURT.append((r,inn,mat,.1))
 def rail(a,b,c,d):
     colliders.append((min(a,c)-3,min(b,d)-3,max(a,c)+3,max(b,d)+3,'rail'));t=.004
@@ -232,6 +233,7 @@ def deselect():
 def fp_mat(mat,folder,stem,res='1024px'):
     mat.use_nodes=True;n=mat.node_tree.nodes;l=mat.node_tree.links;b=n.get('Principled BSDF')
     if not b:return
+    for nd in [x for x in n if x.type=='TEX_IMAGE']:n.remove(nd)
     def tx(k,cs):
         p=os.path.join(folder,f'{res} Textures',f'{stem}_{k}.png')
         if not os.path.exists(p):return None
@@ -243,14 +245,14 @@ def fp_mat(mat,folder,stem,res='1024px'):
     if t:
         m=n.new('ShaderNodeNormalMap');l.new(t.outputs[0],m.inputs[1]);l.new(m.outputs[0],b.inputs['Normal'])
 def join(obs,name):
-    ms=[o for o in obs if o.type=='MESH']
+    ms=[o for o in obs if o.type=='MESH'];names=[o.name for o in obs]
     deselect()
     for o in ms:o.select_set(True)
     bpy.context.view_layer.objects.active=ms[0]
     if len(ms)>1:bpy.ops.object.join()
     ob=bpy.context.view_layer.objects.active
-    for o in obs:
-        if o is not ob and o.name in bpy.data.objects:bpy.data.objects.remove(o)
+    for nm_ in names:
+        if nm_!=ob.name and nm_ in bpy.data.objects:bpy.data.objects.remove(bpy.data.objects[nm_])
     ob.parent=None;ob.select_set(True);bpy.ops.object.transform_apply(location=True,rotation=True,scale=True);ob.name=name;return ob
 def norm(ob,face=0):
     # move the pivot to the footprint centre at floor level, then turn the front to -Y
@@ -258,10 +260,10 @@ def norm(ob,face=0):
     vs=[v.co for v in ob.data.vertices];mn=Vector(map(min,*vs)) if False else Vector((min(v.x for v in vs),min(v.y for v in vs),min(v.z for v in vs)));mx=Vector((max(v.x for v in vs),max(v.y for v in vs),max(v.z for v in vs)))
     ob.data.transform(Matrix.Translation(Vector((-(mn.x+mx.x)/2,-(mn.y+mx.y)/2,-mn.z))));ob.data.update();ob['dim']=list(mx-mn);return ob
 MAST={}
-def fp(key,path,face=0,sub=0,override=None):
+def fp(key,path,face=0,sub=0,override=None,texdir=None):
     if key in MAST:return MAST[key]
     b=set(bpy.data.objects);bpy.ops.wm.obj_import(filepath=path);obs=[o for o in bpy.data.objects if o not in b]
-    folder=os.path.dirname(path);stems=sorted({os.path.basename(p).rsplit('_BaseColor',1)[0] for p in glob.glob(os.path.join(folder,'1024px Textures','*_BaseColor.png'))})
+    folder=texdir or os.path.dirname(path);stems=sorted({os.path.basename(p).rsplit('_BaseColor',1)[0] for p in glob.glob(os.path.join(folder,'1024px Textures','*_BaseColor.png'))})
     for o in obs:
         for s in getattr(o,'material_slots',[]):
             if s.material and stems:
@@ -299,7 +301,7 @@ def soft(mat,w,d,h,loc,rot=0,crown=.2,name='cush',cuts=2,bev=.3):
     bm=bmesh.new();bmesh.ops.create_cube(bm,size=1);
     me=bpy.data.meshes.new(name);bm.to_mesh(me);bm.free();ob=bpy.data.objects.new(name,me);col.objects.link(ob)
     ob.scale=(w/2,d/2,h/2);ob.location=loc;ob.rotation_euler=(0,0,math.radians(rot))
-    s=ob.modifiers.new('s','SUBSURF');s.levels=s.render_levels=4
+    ob.scale=(1,1,1);me.transform(Matrix.Diagonal((w,d,h,1)));bv=ob.modifiers.new('s','BEVEL');bv.width=min(.05,h*.42);bv.segments=4
     me.materials.append(MAT[mat]);
     for p in me.polygons:p.use_smooth=True
     ob['furn']=1;return ob
@@ -341,6 +343,7 @@ def plant(n,r,h=None,name='Plant',ratio=.5,leaf='leaf',potmat='pot',free=False,s
     gx,gy=(X(r[0])+X(r[2]))/2,(Y(r[1])+Y(r[3]))/2
     for p in (parts[:1] if leafonly else parts):
         o=p.copy();col.objects.link(o);o.hide_render=False;o.hide_set(False);o.scale=(k,k,k);o.location=(gx-cx*k,gy-cy*k,-zmin*k);o['furn']=1
+        if leafonly:o['gobo']=1;o['furn']=0
         if p.name.lower().startswith('plant'):
             o.data=p.data.copy();o.data.materials.clear();o.data.materials.append(MAT[leaf])
             if len(o.data.polygons)>30000:
@@ -389,7 +392,7 @@ def swap_base(ob,path):
             if n_.type=='TEX_IMAGE' and 'BaseColor' in (n_.image.name if n_.image else ''):n_.image=teximg(path,'sRGB')
 swap_base(sofa,f'{HQ}/art/sofa_cream.jpg')
 chair4=fp('chair4',F+'chairs/chair4/chair4.obj',face=-90)
-chair3=fp('chair3',F+'chairs/chair3/chair3.obj',face=0)
+chair3=fp('chair3',F+'chairs/chair3/chair3.obj',face=-90)
 tray=fbx('tray','CGT_coffee_table_002.fbx')
 lamp=fbx('lamp38','CGT_Table_Lamp_38_001.fbx')
 # DRAWING
@@ -472,11 +475,13 @@ sc_=Mesher();sc_.box('blackstone',x1+.02,Y(2895),.86,x1+.05,Y(3225),1.76);[o.__s
 dining=fp('table6',F+'tables/table6/Table6.obj')
 place(dining,(2689,1902,2992,2205),0,'Dining table',h=.76)
 for x,y,rot in[(2750,1858,0),(2931,1858,0),(2750,2249,180),(2931,2249,180),(2645,1963,-90),(2645,2144,-90),(3036,1963,90),(3036,2144,90)]:
-    place(chair3,(x-40,y-40,x+40,y+40),rot,'Dining chair',free=True,uniform=False,h=.98,label=(x==2750 and y==1858))
+    place(chair3,(x-38,y-38,x+38,y+38),rot,'Dining chair',free=True,uniform=False,h=.98,label=(x==2750 and y==1858))
 colliders.append((2600,1820,3080,2290,'Dining set'))
-glb('vase2','%s/ph/brass_vase_02/brass_vase_02.gltf'%HQ,((X(2689)+X(2992))/2,(Y(1902)+Y(2205))/2,.76),.3)
+glb('vase2','%s/ph/brass_vase_02/brass_vase_02.gltf'%HQ,((X(2689)+X(2992))/2,(Y(1902)+Y(2205))/2,.79),.3)
 plant(6,(3250,1600,3370,1720),h=1.9,name='Plant',potmat='potDark')
 
+BEDFACE=-90
+exec(open(f'{HQ}/rooms2.py').read())
 # ---------- finish ----------
 for o in M.build('shell'):o['shell']=1
 for o in GLASS.build('glass'):o['glass']=1;o['shell']=0
@@ -487,7 +492,7 @@ s=bpy.data.lights.new('sun','SUN');s.energy=11;s.angle=math.radians(1.0);s.color
 d=Vector((-.5,-.72,.52)).normalized();so.rotation_euler=d.to_track_quat('Z','Y').to_euler()
 for n_,r,f,s_ in ROOMS:
     if n_ in("Balcony","Son's Balcony","Master's Balcony","Utility"):continue
-    w_=(r[2]-r[0])/S*FT;d_=(r[3]-r[1])/S*FT;L=bpy.data.lights.new('fill_'+n_,'AREA');L.shape='RECTANGLE';L.size=max(.3,w_*.7);L.size_y=max(.3,d_*.7);L.energy=w_*d_*1.5;L.color=(1,.94,.86);L.cycles.max_bounces=4;Lo=bpy.data.objects.new(L.name,L);col.objects.link(Lo);Lo.location=((X(r[0])+X(r[2]))/2,(Y(r[1])+Y(r[3]))/2,H-.16);Lo.visible_camera=False;Lo.visible_glossy=False;Lo['fill']=1
+    w_=(r[2]-r[0])/S*FT;d_=(r[3]-r[1])/S*FT;L=bpy.data.lights.new('fill_'+n_,'AREA');L.shape='RECTANGLE';L.size=max(.3,w_*.7);L.size_y=max(.3,d_*.7);L.energy=w_*d_*1.5;L.color=(1,.94,.86);L.cycles.max_bounces=4;Lo=bpy.data.objects.new(L.name,L);col.objects.link(Lo);Lo.location=((X(r[0])+X(r[2]))/2,(Y(r[1])+Y(r[3]))/2,H-.16);Lo.visible_camera=False;Lo.visible_glossy=False;Lo.visible_transmission=False;Lo['fill']=1
 # foliage outside the balcony casts dappled sun, matching photo 1
 load_plants()
 for gx,gy,hh,n_ in[(3560,4240,5.4,9),(3980,4290,6.2,10),(4420,4250,5.6,9),(4820,4300,6.0,10),(2650,3760,5.5,9),(3050,3790,6,10)]:
@@ -506,6 +511,14 @@ def shot(name,px,py,yaw,lens=20,z=1.676,samples=128,res=(1600,1000),pitch=0):
     # yaw 0 looks up the page, 90 looks page-left, matching the walkthrough
     ob.rotation_euler=(math.pi/2+pitch,0,math.radians(yaw));sc.camera=ob;sc.cycles.samples=samples;sc.render.resolution_x,sc.render.resolution_y=res;sc.render.filepath=f'{HQ}/renders/{name}.png';bpy.ops.render.render(write_still=True)
 if 'blend' in ARGS:bpy.ops.wm.save_as_mainfile(filepath=f'{HQ}/scene.blend')
+if 'plan' in ARGS:
+    for o in col.objects:
+        if o.type=='MESH' and o.data.materials and o.data.materials[0].name in('ceil','led') or o.get('gobo'):o.hide_render=True
+    sc.render.engine='BLENDER_WORKBENCH';sc.display.shading.light='STUDIO';sc.display.shading.color_type='TEXTURE';sc.display.shading.show_cavity=True;sc.view_settings.view_transform='Standard';sc.view_settings.look='None';sc.view_settings.exposure=0
+    c=bpy.data.cameras.new('plan');c.type='ORTHO';c.ortho_scale=26;c.clip_end=500;ob=bpy.data.objects.new('plan',c);col.objects.link(ob);ob.location=(X(3250),Y(2150),40);sc.camera=ob;sc.render.resolution_x,sc.render.resolution_y=2400,2000;sc.render.filepath=f'{HQ}/renders/plan.png';bpy.ops.render.render(write_still=True)
+if 'views' in ARGS:
+    for nm,a in(('master',(2000,3500,30)),('son',(2150,950,50)),('daughter',(3700,1300,-143)),('guest',(5100,2650,-120)),('sbath',(1570,1500,40)),('balcony',(4680,3980,74)),('foyer',(4800,2130,80)),('utility',(3500,480,-150))):
+        shot(nm,*a,samples=48,res=(1100,700))
 if 'test' in ARGS:
     shot('drawing',3760,2560,-112,samples=int(ARGS[ARGS.index('test')+1]) if len(ARGS)>ARGS.index('test')+1 else 96)
     shot('living',3160,2520,124,samples=96)

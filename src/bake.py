@@ -40,7 +40,7 @@ for m in shell.data.materials:
     if 'BAKE' in n:n.remove(n['BAKE'])
     for nd in [x for x in n if x.type=='UVMAP']:n.remove(nd)
 # ---------- furniture: bake light into vertices ----------
-furn=[o for o in col.objects if o.type=='MESH' and o.get('furn')==1 and not o.hide_render]
+furn=[o for o in col.objects if o.type=='MESH' and o.get('furn')==1 and not o.hide_render and not o.get('gobo')]
 print('furniture objects',len(furn))
 for o in furn:
     deselect();o.select_set(True);bpy.context.view_layer.objects.active=o
@@ -81,10 +81,10 @@ for im in bpy.data.images:
         k=mx/max(im.size);im.scale(int(im.size[0]*k),int(im.size[1]*k))
 deselect()
 for o in col.objects:
-    if o.type=='MESH' and not o.hide_render:o.select_set(True)
+    if o.type=='MESH' and not o.hide_render and not o.get('gobo'):o.select_set(True)
 bpy.context.view_layer.objects.active=shell
 for o in bpy.context.selected_objects:
     if o is not shell:o.data.uv_layers.active=o.data.uv_layers[0] if o.data.uv_layers else None
-bpy.ops.export_scene.gltf(filepath=f'{OUT}/scene.glb',export_format='GLB',use_selection=True,export_image_format='WEBP',export_image_quality=82,export_apply=False,export_yup=True,export_texcoords=True,export_normals=True,export_vertex_color='ACTIVE',export_all_vertex_colors=True,export_lights=False,export_cameras=False,export_materials='EXPORT')
+bpy.ops.export_scene.gltf(filepath=f'{OUT}/scene.glb',export_format='GLB',use_selection=True,export_image_format='WEBP',export_image_quality=76,export_apply=False,export_yup=True,export_texcoords=True,export_normals=True,export_vertex_color='ACTIVE',export_all_vertex_colors=True,export_lights=False,export_cameras=False,export_materials='EXPORT')
 print('EXPORT DONE',round(time.time()-t0),os.path.getsize(f'{OUT}/scene.glb')/1e6,'MB')
 json.dump(dict(colliders=colliders,items=ITEMS,rooms=[dict(n=n_,r=r,f=f,size=s_) for n_,r,f,s_ in ROOMS]),open(f'{OUT}/layout.json','w'))

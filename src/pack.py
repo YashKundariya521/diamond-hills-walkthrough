@@ -6,7 +6,8 @@ js=open(f'{hq}/viewer.bundle.js',encoding='utf-8').read().replace('</script>','<
 b=lambda p:base64.b64encode(open(p,'rb').read()).decode()
 lay=json.load(open(f'{out}/layout.json'))
 notes=[
- 'Furnished so far: Drawing Room, Living Room and Dining. The other rooms are bare shells until you approve this look.',
+ 'Every room is furnished. Bath fixtures, kitchen cabinets, rugs, poufs, the jhula and most plants are additions; none are drawn on the plan.',
+ 'The mandir holds a plain brass kalash, not a murti.',
  'Light was calculated once in Blender and stored, so it does not change as you move. Reflections are approximate.',
  'The mural, bird panels and jute are drawn in code, so they are simpler than your photos.',
  'Sofas, chairs and plants are from your model packs, recoloured and resized to fit the plan.',
